@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect, useRef } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface CarouselProps {
   items: React.ReactNode[];
@@ -10,8 +10,29 @@ interface CarouselProps {
 
 export default function Carousel({ items, itemsPerView = 3 }: CarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [responsiveItemsPerView, setResponsiveItemsPerView] =
+    useState(itemsPerView);
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
+  const carouselRef = useRef<HTMLDivElement>(null);
 
-  const maxIndex = Math.max(0, items.length - itemsPerView);
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 640) {
+        setResponsiveItemsPerView(1);
+      } else if (window.innerWidth < 1024) {
+        setResponsiveItemsPerView(2);
+      } else {
+        setResponsiveItemsPerView(itemsPerView);
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [itemsPerView]);
+
+  const maxIndex = Math.max(0, items.length - responsiveItemsPerView);
 
   const handlePrev = () => {
     setCurrentIndex((prev) => Math.max(0, prev - 1));
@@ -20,25 +41,59 @@ export default function Carousel({ items, itemsPerView = 3 }: CarouselProps) {
   const handleNext = () => {
     setCurrentIndex((prev) => Math.min(maxIndex, prev + 1));
   };
-  // @ts-ignore
-  const visibleItems = items.slice(currentIndex, currentIndex + itemsPerView);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe && currentIndex < maxIndex) {
+      handleNext();
+    }
+    if (isRightSwipe && currentIndex > 0) {
+      handlePrev();
+    }
+
+    setTouchStart(0);
+    setTouchEnd(0);
+  };
 
   return (
     <div className="relative">
       {/* Carousel Container */}
-      <div className="overflow-hidden">
+      <div
+        className="overflow-hidden"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        ref={carouselRef}
+      >
         <div
-          className="flex gap-6 transition-transform duration-300 ease-out"
+          className="flex gap-4 md:gap-6 transition-transform duration-300 ease-out"
           style={{
-            transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`,
-            width: `${(items.length / itemsPerView) * 100}%`,
+            transform: `translateX(-${currentIndex * (100 / responsiveItemsPerView)}%)`,
           }}
         >
           {items.map((item, index) => (
             <div
               key={index}
-              className="flex-shrink-0"
-              style={{ width: `${100 / items.length}%` }}
+              className="flex-shrink-0 w-full md:w-auto"
+              style={{
+                width:
+                  responsiveItemsPerView === 1
+                    ? "100%"
+                    : `calc(${100 / responsiveItemsPerView}% - ${((responsiveItemsPerView - 1) * (responsiveItemsPerView === 2 ? 12 : 18)) / responsiveItemsPerView}px)`,
+              }}
             >
               {item}
             </div>
@@ -46,11 +101,11 @@ export default function Carousel({ items, itemsPerView = 3 }: CarouselProps) {
         </div>
       </div>
 
-      {/* Navigation Buttons */}
+      {/* Navigation Buttons - Hidden on Mobile */}
       <button
         onClick={handlePrev}
         disabled={currentIndex === 0}
-        className="absolute -left-16 top-1/2 -translate-y-1/2 p-2 rounded-full bg-primary text-white hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition"
+        className="hidden md:flex absolute -left-16 top-1/2 -translate-y-1/2 p-2 rounded-full bg-primary text-white hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition z-10 shadow-lg items-center justify-center"
         aria-label="Previous slide"
       >
         <ChevronLeft size={24} />
@@ -59,7 +114,7 @@ export default function Carousel({ items, itemsPerView = 3 }: CarouselProps) {
       <button
         onClick={handleNext}
         disabled={currentIndex === maxIndex}
-        className="absolute -right-16 top-1/2 -translate-y-1/2 p-2 rounded-full bg-primary text-white hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition"
+        className="hidden md:flex absolute -right-16 top-1/2 -translate-y-1/2 p-2 rounded-full bg-primary text-white hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition z-10 shadow-lg items-center justify-center"
         aria-label="Next slide"
       >
         <ChevronRight size={24} />
@@ -72,7 +127,7 @@ export default function Carousel({ items, itemsPerView = 3 }: CarouselProps) {
             key={index}
             onClick={() => setCurrentIndex(index)}
             className={`w-2 h-2 rounded-full transition ${
-              index === currentIndex ? 'bg-primary' : 'bg-border'
+              index === currentIndex ? "bg-primary" : "bg-border"
             }`}
             aria-label={`Go to slide ${index + 1}`}
           />

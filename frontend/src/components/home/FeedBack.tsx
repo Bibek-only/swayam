@@ -1,52 +1,52 @@
 import { Card } from "../ui/card";
 import Carousel from "../Carousal";
-import { Star, MessageSquare } from 'lucide-react';
+import { Star, MessageSquare } from "lucide-react";
 
 const feedbackData = [
   {
     id: 1,
-    name: 'Rajesh Kumar',
-    role: 'Farmer, Punjab',
-    image: '👨‍🌾',
+    name: "Rajesh Kumar",
+    role: "Farmer, Punjab",
+    image: "👨‍🌾",
     rating: 5,
     message:
-      'Swayam helped me convert my stubbles into income. The platform is easy to use and the buyers are trustworthy. Highly recommended!',
+      "Swayam helped me convert my stubbles into income. The platform is easy to use and the buyers are trustworthy. Highly recommended!",
   },
   {
     id: 2,
-    name: 'Priya Singh',
-    role: 'Organization Manager',
-    image: '👩‍💼',
+    name: "Priya Singh",
+    role: "Organization Manager",
+    image: "👩‍💼",
     rating: 5,
     message:
-      'We found high-quality organic materials through Swayam. The transparency and reliability make this platform invaluable for our business.',
+      "We found high-quality organic materials through Swayam. The transparency and reliability make this platform invaluable for our business.",
   },
   {
     id: 3,
-    name: 'Harjeet Patel',
-    role: 'Farmer, Haryana',
-    image: '👨‍🌾',
+    name: "Harjeet Patel",
+    role: "Farmer, Haryana",
+    image: "👨‍🌾",
     rating: 5,
     message:
-      'No more burning fields! I earned good money from my stubbles and helped the environment. This platform is a game-changer!',
+      "No more burning fields! I earned good money from my stubbles and helped the environment. This platform is a game-changer!",
   },
   {
     id: 4,
-    name: 'Neha Sharma',
-    role: 'CSR Director',
-    image: '👩‍💼',
+    name: "Neha Sharma",
+    role: "CSR Director",
+    image: "👩‍💼",
     rating: 5,
     message:
-      'Perfect platform for our sustainability initiatives. We can source organic materials while supporting farmers directly.',
+      "Perfect platform for our sustainability initiatives. We can source organic materials while supporting farmers directly.",
   },
   {
     id: 5,
-    name: 'Vikram Singh',
-    role: 'Farmer, Uttarakhand',
-    image: '👨‍🌾',
+    name: "Vikram Singh",
+    role: "Farmer, Uttarakhand",
+    image: "👨‍🌾",
     rating: 5,
     message:
-      'The payment system is transparent and quick. Swayam has truly transformed how I manage my farm waste.',
+      "The payment system is transparent and quick. Swayam has truly transformed how I manage my farm waste.",
   },
 ];
 
@@ -66,17 +66,11 @@ const FeedbackSection = () => {
         </div>
         <div className="flex">
           {Array.from({ length: feedback.rating }).map((_, i) => (
-            <Star
-              key={i}
-              size={16}
-              className="fill-accent text-accent"
-            />
+            <Star key={i} size={16} className="fill-accent text-accent" />
           ))}
         </div>
       </div>
-      <p className="text-foreground/80 leading-relaxed">
-        "{feedback.message}"
-      </p>
+      <p className="text-foreground/80 leading-relaxed">"{feedback.message}"</p>
     </Card>
   ));
 
@@ -98,12 +92,12 @@ const FeedbackSection = () => {
           </p>
         </div>
 
-        <div className="px-20">
+        <div className="md:px-20">
           <Carousel items={feedbackCards} itemsPerView={2} />
         </div>
       </div>
     </section>
   );
-}
+};
 
-export default FeedbackSection
+export default FeedbackSection;
